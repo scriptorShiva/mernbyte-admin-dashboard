@@ -1,16 +1,38 @@
-import { Layout, Card, Space, Form, Input, Checkbox, Button } from "antd";
+import {
+  Layout,
+  Card,
+  Space,
+  Form,
+  Input,
+  Checkbox,
+  Button,
+  Alert,
+} from "antd";
 import {
   LockFilled,
   ShoppingCartOutlined,
   UserOutlined,
 } from "@ant-design/icons";
+import { Credentials, FieldType } from "../../types";
+import { useMutation } from "react-query";
+import { login } from "../../http/api";
 
-type FieldType = {
-  username?: string;
-  password?: string;
-  remember?: string;
+const loginUser = async (credentials: Credentials) => {
+  // server call
+
+  const { data } = await login(credentials);
+  return data;
 };
+
 function Login() {
+  const { mutate, isError, error, isLoading } = useMutation({
+    mutationKey: ["login"], // unique for each mutation
+    mutationFn: loginUser,
+    onSuccess: (data) => {
+      console.log(data);
+    },
+  });
+
   return (
     <>
       <Layout
@@ -53,10 +75,21 @@ function Login() {
               name="basic"
               labelCol={{ span: 8 }}
               initialValues={{ remember: true }}
-              // onFinish={onFinish}
-              // onFinishFailed={onFinishFailed}
               autoComplete="off"
+              onFinish={(values) => {
+                mutate({
+                  email: values.username,
+                  password: values.password,
+                });
+              }}
             >
+              {isError && (
+                <Alert
+                  style={{ marginBottom: 10 }}
+                  message={(error as Error)?.message}
+                  type="error"
+                />
+              )}
               <Form.Item<FieldType>
                 name="username"
                 rules={[
@@ -86,7 +119,7 @@ function Login() {
               >
                 <div>
                   <Checkbox>Remember me</Checkbox>
-                  <a href="#">Forgot password</a>
+                  <a href="#">Forgot Password</a>
                 </div>
               </Form.Item>
 
@@ -95,6 +128,7 @@ function Login() {
                   type="primary"
                   htmlType="submit"
                   style={{ width: "100%" }}
+                  loading={isLoading}
                 >
                   Log in
                 </Button>

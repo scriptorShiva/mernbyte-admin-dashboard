@@ -13,13 +13,16 @@
   "dependencies": {
     "@testing-library/react": "^16.0.1",
     "antd": "^5.21.6",
+    "axios": "^1.7.7",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-query": "^3.39.3",
     "react-router": "^6.27.0",
     "react-router-dom": "^6.27.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.6.2",
+    "@types/axios": "^0.14.4",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^7.15.0",
