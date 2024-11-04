@@ -14,8 +14,8 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import { Credentials, FieldType } from "../../types";
-import { useMutation } from "react-query";
-import { login } from "../../http/api";
+import { useMutation, useQuery } from "react-query";
+import { login, self } from "../../http/api";
 
 const loginUser = async (credentials: Credentials) => {
   // server call
@@ -24,11 +24,26 @@ const loginUser = async (credentials: Credentials) => {
   return data;
 };
 
+const getSelf = async () => {
+  const { data } = await self();
+  return data;
+};
+
 function Login() {
+  const { data: selfData, refetch } = useQuery({
+    queryKey: ["self"],
+    queryFn: getSelf,
+    enabled: false, // does not call this function just after render.
+  });
+
   const { mutate, isError, error, isLoading } = useMutation({
     mutationKey: ["login"], // unique for each mutation
     mutationFn: loginUser,
     onSuccess: (data) => {
+      // getself
+      refetch();
+      console.log(selfData, "userData");
+      //store in the state --zustand : whenever user data in in state : loggedIn , otherwise loggedOut
       console.log(data);
     },
   });
