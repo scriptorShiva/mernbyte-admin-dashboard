@@ -15,12 +15,11 @@ import {
 } from "@ant-design/icons";
 import { Credentials, FieldType } from "../../types";
 import { useMutation, useQuery } from "react-query";
-import { login, self } from "../../http/api";
+import { login, self, logout } from "../../http/api";
 import { useAuthStore } from "../../store";
+import { userPermission } from "../../hooks/usePermission";
 
 const loginUser = async (credentials: Credentials) => {
-  // server call
-
   const { data } = await login(credentials);
   return data;
 };
@@ -31,131 +30,150 @@ const getSelf = async () => {
 };
 
 function Login() {
-  const { setUser } = useAuthStore();
+  const { setUser, logout: logoutFromStore } = useAuthStore();
+  const { isAllowed } = userPermission();
 
   const { refetch } = useQuery({
     queryKey: ["self"],
     queryFn: getSelf,
-    enabled: false, // does not call this function just after render.
+    enabled: false,
   });
 
-  const { mutate, isError, error, isLoading } = useMutation({
-    mutationKey: ["login"], // unique for each mutation
-    mutationFn: loginUser,
+  const {
+    mutate: logoutMutate,
+    isError: isLogoutError,
+    error: logoutError,
+    isLoading: isLogoutLoading,
+  } = useMutation({
+    mutationKey: ["logout"],
+    mutationFn: logout,
+    onSuccess: () => {
+      logoutFromStore();
+      return;
+    },
+  });
 
+  const {
+    mutate: loginMutate,
+    isError: isLoginError,
+    error: loginError,
+    isLoading: isLoginLoading,
+  } = useMutation({
+    mutationKey: ["login"],
+    mutationFn: loginUser,
     onSuccess: async () => {
-      // getself
       const selfDataPromise = await refetch();
-      //store in the state --zustand : whenever user data in in state : loggedIn , otherwise loggedOut
+      if (!isAllowed(selfDataPromise.data)) {
+        logoutMutate();
+        return;
+      }
       setUser(selfDataPromise.data);
     },
   });
 
   return (
-    <>
-      <Layout
-        style={{ minHeight: "100vh", display: "grid", placeItems: "center" }}
-      >
-        <Space direction="vertical">
-          <Layout.Content
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Space>
-              <ShoppingCartOutlined
-                style={{ fontSize: 24, color: "#6A1B9A" }}
-              />
-              {/* <div style={{ margin: 0, fontSize: 16, fontWeight: "bold" }}>
-                LoremIpsum
-              </div> */}
-            </Space>
-          </Layout.Content>
-          <Card
-            bordered={false}
-            style={{ width: 300 }}
-            title={
-              <Space
-                style={{
-                  width: "100%",
-                  fontSize: 16,
-                  display: "flex",
-                  justifyContent: "center",
-                }}
-              >
-                <LockFilled /> Sign In
-              </Space>
-            }
-          >
-            <Form
-              name="basic"
-              labelCol={{ span: 8 }}
-              initialValues={{ remember: true }}
-              autoComplete="off"
-              onFinish={(values) => {
-                mutate({
-                  email: values.username,
-                  password: values.password,
-                });
+    <Layout
+      style={{ minHeight: "100vh", display: "grid", placeItems: "center" }}
+    >
+      <Space direction="vertical">
+        <Layout.Content
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Space>
+            <ShoppingCartOutlined style={{ fontSize: 24, color: "#6A1B9A" }} />
+          </Space>
+        </Layout.Content>
+        <Card
+          bordered={false}
+          style={{ width: 300 }}
+          title={
+            <Space
+              style={{
+                width: "100%",
+                fontSize: 16,
+                display: "flex",
+                justifyContent: "center",
               }}
             >
-              {isError && (
-                <Alert
-                  style={{ marginBottom: 10 }}
-                  message={(error as Error)?.message}
-                  type="error"
-                />
-              )}
-              <Form.Item<FieldType>
-                name="username"
-                rules={[
-                  { required: true, message: "Please input your username!" },
-                  { type: "email", message: "Please enter your valid email!" },
-                ]}
-              >
-                <Input prefix={<UserOutlined />} placeholder="Username" />
-              </Form.Item>
+              <LockFilled /> Sign In
+            </Space>
+          }
+        >
+          <Form
+            name="basic"
+            labelCol={{ span: 8 }}
+            initialValues={{ remember: true }}
+            autoComplete="off"
+            onFinish={(values) => {
+              loginMutate({
+                email: values.username,
+                password: values.password,
+              });
+            }}
+          >
+            {isLoginError && (
+              <Alert
+                style={{ marginBottom: 10 }}
+                message={(loginError as Error)?.message}
+                type="error"
+              />
+            )}
+            {isLogoutError && (
+              <Alert
+                style={{ marginBottom: 10 }}
+                message={(logoutError as Error)?.message}
+                type="error"
+              />
+            )}
 
-              <Form.Item<FieldType>
-                name="password"
-                rules={[
-                  { required: true, message: "Please input your password!" },
-                ]}
-              >
-                <Input.Password
-                  prefix={<LockFilled />}
-                  placeholder="Password"
-                />
-              </Form.Item>
+            <Form.Item<FieldType>
+              name="username"
+              rules={[
+                { required: true, message: "Please input your username!" },
+                { type: "email", message: "Please enter a valid email!" },
+              ]}
+            >
+              <Input prefix={<UserOutlined />} placeholder="Username" />
+            </Form.Item>
 
-              <Form.Item<FieldType>
-                name="remember"
-                valuePropName="checked"
-                wrapperCol={{}}
-              >
-                <div>
-                  <Checkbox>Remember me</Checkbox>
-                  <a href="#">Forgot Password</a>
-                </div>
-              </Form.Item>
+            <Form.Item<FieldType>
+              name="password"
+              rules={[
+                { required: true, message: "Please input your password!" },
+              ]}
+            >
+              <Input.Password prefix={<LockFilled />} placeholder="Password" />
+            </Form.Item>
 
-              <Form.Item>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  style={{ width: "100%" }}
-                  loading={isLoading}
-                >
-                  Log in
-                </Button>
-              </Form.Item>
-            </Form>
-          </Card>
-        </Space>
-      </Layout>
-    </>
+            <Form.Item<FieldType>
+              name="remember"
+              valuePropName="checked"
+              wrapperCol={{}}
+            >
+              <div>
+                <Checkbox>Remember me</Checkbox>
+                <a href="#">Forgot Password</a>
+              </div>
+            </Form.Item>
+
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                style={{ width: "100%" }}
+                loading={isLoginLoading || isLogoutLoading}
+              >
+                Log in
+              </Button>
+            </Form.Item>
+          </Form>
+        </Card>
+      </Space>
+    </Layout>
   );
 }
 
