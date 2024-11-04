@@ -16,6 +16,7 @@ import {
 import { Credentials, FieldType } from "../../types";
 import { useMutation, useQuery } from "react-query";
 import { login, self } from "../../http/api";
+import { useAuthStore } from "../../store";
 
 const loginUser = async (credentials: Credentials) => {
   // server call
@@ -30,7 +31,9 @@ const getSelf = async () => {
 };
 
 function Login() {
-  const { data: selfData, refetch } = useQuery({
+  const { setUser } = useAuthStore();
+
+  const { refetch } = useQuery({
     queryKey: ["self"],
     queryFn: getSelf,
     enabled: false, // does not call this function just after render.
@@ -39,12 +42,12 @@ function Login() {
   const { mutate, isError, error, isLoading } = useMutation({
     mutationKey: ["login"], // unique for each mutation
     mutationFn: loginUser,
-    onSuccess: (data) => {
+
+    onSuccess: async () => {
       // getself
-      refetch();
-      console.log(selfData, "userData");
+      const selfDataPromise = await refetch();
       //store in the state --zustand : whenever user data in in state : loggedIn , otherwise loggedOut
-      console.log(data);
+      setUser(selfDataPromise.data);
     },
   });
 
