@@ -8,16 +8,13 @@ import {
   Button,
   Alert,
 } from "antd";
-import {
-  LockFilled,
-  ShoppingCartOutlined,
-  UserOutlined,
-} from "@ant-design/icons";
+import { LockFilled, UserOutlined } from "@ant-design/icons";
 import { Credentials, FieldType } from "../../types";
 import { useMutation, useQuery } from "react-query";
 import { login, self, logout } from "../../http/api";
 import { useAuthStore } from "../../store";
 import { userPermission } from "../../hooks/usePermission";
+import Logo from "../../components/logo/Logo";
 
 const loginUser = async (credentials: Credentials) => {
   const { data } = await login(credentials);
@@ -84,7 +81,7 @@ function Login() {
           }}
         >
           <Space>
-            <ShoppingCartOutlined style={{ fontSize: 24, color: "#6A1B9A" }} />
+            <Logo />
           </Space>
         </Layout.Content>
         <Card

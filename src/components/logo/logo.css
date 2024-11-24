@@ -1,0 +1,18 @@
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.logo-image {
+  width: 42px; /* Adjust the size of the image */
+  height: 42px;
+  border-radius: 50%; /* Makes the image circular */
+  object-fit: cover; /* Ensures the image covers its dimensions */
+}
+
+.logo-text {
+  font-size: 16px; /* Small text size */
+  font-weight: 500; /* Medium font weight */
+  color: #4a5568; /* Gray color */
+}
