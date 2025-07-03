@@ -80,6 +80,7 @@ const Dashboard = () => {
   });
 
   // protection
+  // get user from global zustand store
   const { user } = useAuthStore();
   if (user === null) {
     return <Navigate to="/auth/login" replace={true} />;
@@ -115,7 +116,12 @@ const Dashboard = () => {
               }}
             >
               <Flex gap="middle" align="start" justify="space-between">
-                <Badge text="Hello" status="success" />
+                <Badge
+                  text={
+                    user.role === "You are admin" ? "Admin" : user.tenant?.name
+                  }
+                  status="success"
+                />
                 <Space size={16}>
                   <Badge dot={true}>
                     <BellFilled />
@@ -145,21 +151,11 @@ const Dashboard = () => {
                 </Space>
               </Flex>
             </Header>
-            <Content style={{ margin: "0 16px" }}>
+            <Content style={{ margin: "24px 24pxpx" }}>
               <Breadcrumb style={{ margin: "16px 0" }}>
                 <Breadcrumb.Item>User</Breadcrumb.Item>
                 <Breadcrumb.Item>Bill</Breadcrumb.Item>
               </Breadcrumb>
-              <div
-                style={{
-                  padding: 24,
-                  minHeight: 360,
-                  background: colorBgContainer,
-                  borderRadius: borderRadiusLG,
-                }}
-              >
-                Bill is a cat.
-              </div>
               <Outlet />
             </Content>
             <Footer style={{ textAlign: "center" }}>
