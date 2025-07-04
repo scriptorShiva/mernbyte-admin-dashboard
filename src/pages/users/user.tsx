@@ -6,6 +6,7 @@ import { User } from "../../types";
 import ColumnGroup from "antd/es/table/ColumnGroup";
 import Column from "antd/es/table/Column";
 import { useAuthStore } from "../../store";
+import UserFilter from "./UserFilter";
 
 const roleColors: Record<string, string> = {
   admin: "purple",
@@ -44,12 +45,24 @@ function Users() {
           ]}
         />
 
+        {/* User filter */}
+        <UserFilter
+          onFilterChange={(filterName: string, filterValue: string) => {
+            console.log(filterName, filterValue);
+          }}
+        />
+
         {/* User page design */}
         {isLoading && <div>Loading...</div>}
         {isError && <div>{error.message}</div>}
 
         {users && (
-          <Table<User> dataSource={users} pagination={{ pageSize: 5 }}>
+          <Table<User>
+            dataSource={users}
+            pagination={{ pageSize: 5 }}
+            scroll={{ x: "max-content" }}
+            rowKey={(user) => user.id}
+          >
             <Column title="ID" dataIndex="id" key="id" />
             <ColumnGroup title="Name">
               <Column
