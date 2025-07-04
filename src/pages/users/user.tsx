@@ -1,10 +1,11 @@
 import { Breadcrumb, Space, Table, Tag } from "antd";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getUsers } from "../../http/api";
 import { User } from "../../types";
 import ColumnGroup from "antd/es/table/ColumnGroup";
 import Column from "antd/es/table/Column";
+import { useAuthStore } from "../../store";
 
 const roleColors: Record<string, string> = {
   admin: "purple",
@@ -14,6 +15,11 @@ const roleColors: Record<string, string> = {
 };
 
 function Users() {
+  // Accept admin no one will be able to access this users list.
+  const { user } = useAuthStore();
+  if (user?.role !== "admin") {
+    return <Navigate to="/" replace={true} />;
+  }
   // react query
   const {
     data: users,

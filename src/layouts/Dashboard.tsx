@@ -28,38 +28,46 @@ import { logout } from "../http/api";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
-const items: MenuItem[] = [
-  {
-    key: "/",
-    icon: <HomeOutlined />,
-    label: <NavLink to="/">Home</NavLink>,
-  },
-  {
-    key: "/users",
-    icon: <UserOutlined />,
-    label: <NavLink to="/users">Users</NavLink>,
-  },
-  {
-    key: "/tenants",
-    icon: <ShopOutlined />,
-    label: <NavLink to="/users">Tenants</NavLink>,
-  },
-  {
-    key: "/products",
-    icon: <ProductOutlined />,
-    label: <NavLink to="/users">Products</NavLink>,
-  },
-  {
-    key: "/sales",
-    icon: <BarChartOutlined />,
-    label: <NavLink to="/users">Sales</NavLink>,
-  },
-  {
-    key: "/promos",
-    icon: <BarcodeOutlined />,
-    label: <NavLink to="/users">Promos</NavLink>,
-  },
-];
+const getItemsListBasedOnRole = (role: string) => {
+  const baseItems: MenuItem[] = [
+    {
+      key: "/",
+      icon: <HomeOutlined />,
+      label: <NavLink to="/">Home</NavLink>,
+    },
+
+    {
+      key: "/tenants",
+      icon: <ShopOutlined />,
+      label: <NavLink to="/users">Tenants</NavLink>,
+    },
+    {
+      key: "/products",
+      icon: <ProductOutlined />,
+      label: <NavLink to="/users">Products</NavLink>,
+    },
+    {
+      key: "/sales",
+      icon: <BarChartOutlined />,
+      label: <NavLink to="/users">Sales</NavLink>,
+    },
+    {
+      key: "/promos",
+      icon: <BarcodeOutlined />,
+      label: <NavLink to="/users">Promos</NavLink>,
+    },
+  ];
+
+  if (role === "admin") {
+    baseItems.splice(1, 0, {
+      key: "/users",
+      icon: <UserOutlined />,
+      label: <NavLink to="/users">Users</NavLink>,
+    });
+  }
+
+  return baseItems;
+};
 
 const Dashboard = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -81,6 +89,10 @@ const Dashboard = () => {
   // protection
   // get user from global zustand store
   const { user } = useAuthStore();
+
+  // for rendering users list based on role
+  const items = getItemsListBasedOnRole(user?.role as string);
+
   if (user === null) {
     return <Navigate to="/auth/login" replace={true} />;
   }
