@@ -3,7 +3,6 @@ import { useAuthStore } from "../store";
 import {
   Avatar,
   Badge,
-  Breadcrumb,
   Dropdown,
   Flex,
   Layout,
@@ -65,7 +64,7 @@ const items: MenuItem[] = [
 const Dashboard = () => {
   const [collapsed, setCollapsed] = useState(false);
   const {
-    token: { colorBgContainer, borderRadiusLG },
+    token: { colorBgContainer },
   } = theme.useToken();
 
   //logout
@@ -151,11 +150,7 @@ const Dashboard = () => {
                 </Space>
               </Flex>
             </Header>
-            <Content style={{ margin: "24px 24pxpx" }}>
-              <Breadcrumb style={{ margin: "16px 0" }}>
-                <Breadcrumb.Item>User</Breadcrumb.Item>
-                <Breadcrumb.Item>Bill</Breadcrumb.Item>
-              </Breadcrumb>
+            <Content style={{ margin: "24px 24px" }}>
               <Outlet />
             </Content>
             <Footer style={{ textAlign: "center" }}>

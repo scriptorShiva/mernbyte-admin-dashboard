@@ -1,0 +1,140 @@
+.cards-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+
+  .sales-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto auto;
+    gap: 1rem;
+
+    .data {
+      grid-column: span 2;
+      display: flex;
+      gap: 1rem;
+
+      .card {
+        width: 100%;
+        flex: 1;
+
+        .card-header {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .card-value {
+          font-size: 38px;
+          text-align: center;
+          font-weight: 500;
+        }
+      }
+    }
+
+    .analytics-card {
+      grid-column: span 2;
+      width: 100%;
+
+      .card-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .card-value {
+        font-size: 38px;
+        text-align: center;
+        font-weight: 500;
+      }
+    }
+  }
+
+  .order-card {
+    width: 100%;
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .recent-orders-card-value {
+      font-size: 18px;
+      font-weight: 500;
+      padding: 20px;
+
+      ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+
+        li {
+          margin-bottom: 12px;
+          font-size: 16px;
+          font-weight: 500;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+
+          .customer-details {
+            .customer-name {
+              font-weight: bold;
+            }
+
+            .customer-address {
+              font-size: 14px;
+            }
+          }
+
+          .order-details {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 150px;
+
+            .order-amount {
+              font-size: 16px;
+              font-weight: bold;
+            }
+          }
+        }
+      }
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 10px;
+
+      .see-all-orders {
+        cursor: pointer;
+        font-weight: bold;
+        border-bottom: 3px solid #f65f42;
+        width: fit-content;
+        margin: 0 auto;
+      }
+    }
+  }
+}
+
+/* Reusable icon wrappers */
+.icon-wrapper {
+  width: 50px;
+  height: 50px;
+  border-radius: 30%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &.icon-green {
+    background-color: #13c9251f;
+  }
+
+  &.icon-blue {
+    background-color: #14aaff1f;
+  }
+
+  &.icon-orange {
+    background-color: #f65f421f;
+  }
+}
