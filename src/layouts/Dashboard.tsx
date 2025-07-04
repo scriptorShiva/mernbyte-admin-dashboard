@@ -23,7 +23,7 @@ import {
   UserOutlined,
 } from "@ant-design/icons/lib/icons";
 import Logo from "../components/logo/Logo";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 import { logout } from "../http/api";
 
 type MenuItem = Required<MenuProps>["items"][number];
@@ -117,7 +117,7 @@ const Dashboard = () => {
               <Flex gap="middle" align="start" justify="space-between">
                 <Badge
                   text={
-                    user.role === "You are admin" ? "Admin" : user.tenant?.name
+                    user.role === "admin" ? "Hi, Admin Boss" : user.tenant?.name
                   }
                   status="success"
                 />

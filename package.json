@@ -11,12 +11,12 @@
     "test": "vitest --watch"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.81.5",
     "@testing-library/react": "^16.0.1",
     "antd": "^5.21.6",
     "axios": "^1.7.7",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-query": "^3.39.3",
     "react-router": "^6.27.0",
     "react-router-dom": "^6.27.0",
     "zustand": "^5.0.1"

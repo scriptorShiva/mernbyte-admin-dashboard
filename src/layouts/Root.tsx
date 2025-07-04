@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Outlet } from "react-router";
 import { self } from "../http/api";
 import { useAuthStore } from "../store";

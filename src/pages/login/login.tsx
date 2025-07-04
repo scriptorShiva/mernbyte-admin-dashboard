@@ -10,7 +10,7 @@ import {
 } from "antd";
 import { LockFilled, UserOutlined } from "@ant-design/icons";
 import { Credentials, FieldType } from "../../types";
-import { useMutation, useQuery } from "react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { login, self, logout } from "../../http/api";
 import { useAuthStore } from "../../store";
 import { userPermission } from "../../hooks/usePermission";
@@ -40,7 +40,7 @@ function Login() {
     mutate: logoutMutate,
     isError: isLogoutError,
     error: logoutError,
-    isLoading: isLogoutLoading,
+    isPending: isLogoutLoading,
   } = useMutation({
     mutationKey: ["logout"],
     mutationFn: logout,
@@ -54,7 +54,7 @@ function Login() {
     mutate: loginMutate,
     isError: isLoginError,
     error: loginError,
-    isLoading: isLoginLoading,
+    isPending: isLoginLoading,
   } = useMutation({
     mutationKey: ["login"],
     mutationFn: loginUser,
