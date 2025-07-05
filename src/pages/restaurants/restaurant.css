@@ -1,0 +1,10 @@
+.restaurant-filter-card-container {
+  font-size: 16px;
+  display: flex;
+  .left-section {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+}

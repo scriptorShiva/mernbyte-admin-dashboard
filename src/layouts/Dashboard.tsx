@@ -37,9 +37,9 @@ const getItemsListBasedOnRole = (role: string) => {
     },
 
     {
-      key: "/tenants",
+      key: "/restaurants",
       icon: <ShopOutlined />,
-      label: <NavLink to="/users">Tenants</NavLink>,
+      label: <NavLink to="/restaurants">Restaurants</NavLink>,
     },
     {
       key: "/products",

@@ -17,3 +17,9 @@ export type User = {
   role: string;
   createdAt: string;
 };
+
+export type Tenant = {
+  id: number;
+  name: string;
+  address: string;
+};
