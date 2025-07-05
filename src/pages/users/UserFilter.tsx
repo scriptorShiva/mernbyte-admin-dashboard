@@ -1,13 +1,14 @@
-import { Button, Card, Select } from "antd";
+import { Card, Select } from "antd";
 import { Input } from "antd";
-import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined } from "@ant-design/icons";
 import "./user.css";
 
 interface UserFilterProps {
+  children?: React.ReactNode;
   onFilterChange: (filterName: string, filterValue: string) => void;
 }
 
-const UserFilter = ({ onFilterChange }: UserFilterProps) => {
+const UserFilter = ({ onFilterChange, children }: UserFilterProps) => {
   return (
     <>
       <Card>
@@ -42,7 +43,11 @@ const UserFilter = ({ onFilterChange }: UserFilterProps) => {
                 //defaultValue="lucy"
                 style={{ width: 120 }}
                 allowClear
-                options={[{ value: "lucy", label: "Lucy" }]}
+                options={[
+                  { value: "manager", label: "Manager" },
+                  { value: "admin", label: "Admin" },
+                  { value: "customer", label: "Customer" },
+                ]}
                 placeholder="Select"
                 size="large"
                 onChange={(e) => onFilterChange("role", e)}
@@ -50,11 +55,7 @@ const UserFilter = ({ onFilterChange }: UserFilterProps) => {
             </div>
           </div>
           <div className="right-section">
-            <div className="create-user">
-              <Button type="primary" icon={<PlusOutlined />} size={"large"}>
-                Create users
-              </Button>
-            </div>
+            <div className="create-user">{children}</div>
           </div>
         </div>
       </Card>

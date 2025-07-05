@@ -1,4 +1,4 @@
-import { Breadcrumb, Space, Table, Tag } from "antd";
+import { Breadcrumb, Button, Drawer, Space, Table, Tag } from "antd";
 import { Link, Navigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getUsers } from "../../http/api";
@@ -7,6 +7,8 @@ import ColumnGroup from "antd/es/table/ColumnGroup";
 import Column from "antd/es/table/Column";
 import { useAuthStore } from "../../store";
 import UserFilter from "./UserFilter";
+import { useState } from "react";
+import { PlusOutlined } from "@ant-design/icons";
 
 const roleColors: Record<string, string> = {
   admin: "purple",
@@ -16,6 +18,13 @@ const roleColors: Record<string, string> = {
 };
 
 function Users() {
+  // state
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const onClose = () => {
+    setDrawerOpen(false);
+  };
+
   // Accept admin no one will be able to access this users list.
   const { user } = useAuthStore();
   if (user?.role !== "admin") {
@@ -50,7 +59,16 @@ function Users() {
           onFilterChange={(filterName: string, filterValue: string) => {
             console.log(filterName, filterValue);
           }}
-        />
+        >
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            size={"large"}
+            onClick={() => setDrawerOpen(true)}
+          >
+            Create users
+          </Button>
+        </UserFilter>
 
         {/* User page design */}
         {isLoading && <div>Loading...</div>}
@@ -88,6 +106,27 @@ function Users() {
           </Table>
         )}
       </Space>
+
+      {/* Drawer component */}
+      <Drawer
+        title="Create a new account"
+        width={720}
+        onClose={onClose}
+        open={drawerOpen}
+        destroyOnClose={true}
+        extra={
+          <Space>
+            <Button onClick={onClose}>Cancel</Button>
+            <Button type="primary" onClick={onClose}>
+              Submit
+            </Button>
+          </Space>
+        }
+      >
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+      </Drawer>
     </>
   );
 }
