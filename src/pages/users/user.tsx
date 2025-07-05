@@ -25,6 +25,14 @@ function Users() {
   // ant design form hook
   const [formData] = Form.useForm();
 
+  // query params
+  const [queryParams, setQueryParams] = useState({
+    current: 1,
+    pageSize: 5,
+    role: "",
+    q: "",
+  });
+
   // its a react hook : give access to the query cache manager
   // triggers specific refetch of the data , update data in cache manually , reads data from cache
   const queryClient = useQueryClient();
@@ -48,11 +56,18 @@ function Users() {
     isError,
     error,
   } = useQuery({
-    queryKey: ["users"],
+    queryKey: ["users", queryParams],
     queryFn: async () => {
-      const res = await getUsers();
-      console.log(res);
-      return res.data.data;
+      console.log(queryParams, "query params");
+      const queryStringGenerate = new URLSearchParams({
+        role: queryParams.role,
+        currentPage: String(queryParams.current),
+        perPage: String(queryParams.pageSize),
+        q: queryParams.q,
+      }).toString();
+      const res = await getUsers(queryStringGenerate);
+
+      return res.data;
     },
   });
 
@@ -62,7 +77,7 @@ function Users() {
     mutationFn: async (data: CreateUserData) => {
       console.log(data, "ddd");
       const res = await createUser(data);
-      return res.data.data;
+      return res.data;
     },
     onSuccess: () => {
       formData.resetFields();
@@ -102,7 +117,10 @@ function Users() {
         {/* User filter */}
         <UserFilter
           onFilterChange={(filterName: string, filterValue: string) => {
-            console.log(filterName, filterValue);
+            setQueryParams({
+              ...queryParams,
+              [filterName]: filterValue,
+            });
           }}
         >
           <Button
@@ -121,8 +139,19 @@ function Users() {
 
         {users && (
           <Table<User>
-            dataSource={users}
-            pagination={{ pageSize: 5 }}
+            dataSource={users?.data}
+            pagination={{
+              total: users?.total,
+              pageSize: queryParams.pageSize,
+              current: queryParams.current,
+              onChange: (page, pageSize) => {
+                setQueryParams({
+                  ...queryParams,
+                  current: page,
+                  pageSize: pageSize,
+                });
+              },
+            }}
             scroll={{ x: "max-content" }}
             rowKey={(user) => user.id}
           >

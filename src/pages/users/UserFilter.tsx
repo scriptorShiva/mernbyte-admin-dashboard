@@ -19,7 +19,7 @@ const UserFilter = ({ onFilterChange, children }: UserFilterProps) => {
                 addonBefore={<SearchOutlined />}
                 placeholder="Search..."
                 size="large"
-                onChange={(e) => onFilterChange("search", e.target.value)}
+                onChange={(e) => onFilterChange("q", e.target.value)}
                 allowClear
               />
             </div>
