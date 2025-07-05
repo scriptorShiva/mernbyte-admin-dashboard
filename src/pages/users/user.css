@@ -1,4 +1,7 @@
-/* filter */
+.custom-drawer .ant-drawer-body {
+  background-color: #f5f5f5; /* Or your desired color */
+  padding: 24px; /* Optional: keep AntD padding */
+}
 
 .user-filter-card-container {
   font-size: 16px;

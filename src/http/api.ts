@@ -1,4 +1,4 @@
-import { Credentials } from "../types";
+import { CreateUserData, Credentials } from "../types";
 import { api } from "./client";
 
 //Auth Service
@@ -12,3 +12,5 @@ export const logout = () => api.post("/auth/logout");
 export const getUsers = () => api.get("/users");
 
 export const getRestaurants = () => api.get("/tenants");
+
+export const createUser = (user: CreateUserData) => api.post("/users", user);

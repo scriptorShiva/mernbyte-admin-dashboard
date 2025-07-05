@@ -1,14 +1,15 @@
-import { Breadcrumb, Button, Drawer, Space, Table, Tag } from "antd";
+import { Breadcrumb, Button, Drawer, Form, Space, Table, Tag } from "antd";
 import { Link, Navigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { getUsers } from "../../http/api";
-import { User } from "../../types";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createUser, getUsers } from "../../http/api";
+import { CreateUserData, User } from "../../types";
 import ColumnGroup from "antd/es/table/ColumnGroup";
 import Column from "antd/es/table/Column";
 import { useAuthStore } from "../../store";
 import UserFilter from "./UserFilter";
 import { useState } from "react";
 import { PlusOutlined } from "@ant-design/icons";
+import UserForm from "./forms/UserForm";
 
 const roleColors: Record<string, string> = {
   admin: "purple",
@@ -21,8 +22,16 @@ function Users() {
   // state
   const [drawerOpen, setDrawerOpen] = useState(false);
 
+  // ant design form hook
+  const [formData] = Form.useForm();
+
+  // its a react hook : give access to the query cache manager
+  // triggers specific refetch of the data , update data in cache manually , reads data from cache
+  const queryClient = useQueryClient();
+
   const onClose = () => {
     setDrawerOpen(false);
+    formData.resetFields();
   };
 
   // Accept admin no one will be able to access this users list.
@@ -30,7 +39,9 @@ function Users() {
   if (user?.role !== "admin") {
     return <Navigate to="/" replace={true} />;
   }
+
   // react query
+  // for get we use useQuery
   const {
     data: users,
     isLoading,
@@ -44,6 +55,40 @@ function Users() {
       return res.data.data;
     },
   });
+
+  // for create we will use mutation
+  const { mutate: createUserMutate } = useMutation({
+    mutationKey: ["createUser"],
+    mutationFn: async (data: CreateUserData) => {
+      console.log(data, "ddd");
+      const res = await createUser(data);
+      return res.data.data;
+    },
+    onSuccess: () => {
+      formData.resetFields();
+      onClose();
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
+  });
+
+  // on form submit
+  const onSubmit = async () => {
+    // check validations if validations success then next
+    await formData.validateFields();
+    const values = await formData.getFieldsValue();
+
+    createUserMutate({
+      firstName: values.firstname,
+      lastName: values.lastname,
+      email: values.email,
+      password: values.password,
+      role: values.role,
+      tenantId: values.tenantId,
+    });
+
+    console.log(formData.getFieldsValue());
+  };
+
   return (
     <>
       <Space direction="vertical" size="large" style={{ width: "100%" }}>
@@ -109,6 +154,7 @@ function Users() {
 
       {/* Drawer component */}
       <Drawer
+        className="custom-drawer"
         title="Create a new account"
         width={720}
         onClose={onClose}
@@ -117,15 +163,15 @@ function Users() {
         extra={
           <Space>
             <Button onClick={onClose}>Cancel</Button>
-            <Button type="primary" onClick={onClose}>
+            <Button type="primary" onClick={onSubmit}>
               Submit
             </Button>
           </Space>
         }
       >
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
+        <Form layout="vertical" form={formData}>
+          <UserForm />
+        </Form>
       </Drawer>
     </>
   );
