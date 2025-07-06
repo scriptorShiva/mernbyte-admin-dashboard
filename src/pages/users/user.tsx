@@ -1,6 +1,20 @@
-import { Breadcrumb, Button, Drawer, Form, Space, Table, Tag } from "antd";
+import {
+  Breadcrumb,
+  Button,
+  Drawer,
+  Form,
+  Space,
+  //Spin,
+  Table,
+  Tag,
+} from "antd";
 import { Link, Navigate } from "react-router-dom";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { createUser, getUsers } from "../../http/api";
 import { CreateUserData, User } from "../../types";
 import ColumnGroup from "antd/es/table/ColumnGroup";
@@ -52,23 +66,33 @@ function Users() {
   // for get we use useQuery
   const {
     data: users,
-    isLoading,
+    isFetching,
     isError,
     error,
   } = useQuery({
     queryKey: ["users", queryParams],
     queryFn: async () => {
-      console.log(queryParams, "query params");
-      const queryStringGenerate = new URLSearchParams({
+      const rawParams = {
         role: queryParams.role,
         currentPage: String(queryParams.current),
         perPage: String(queryParams.pageSize),
         q: queryParams.q,
-      }).toString();
+      };
+
+      // Remove empty , null , undefined values
+      const cleanedParams: Record<string, any> = {};
+      Object.entries(rawParams).forEach(([key, value]) => {
+        if (value !== "" && value !== undefined && value !== null) {
+          cleanedParams[key] = String(value);
+        }
+      });
+
+      const queryStringGenerate = new URLSearchParams(cleanedParams).toString();
       const res = await getUsers(queryStringGenerate);
 
       return res.data;
     },
+    placeholderData: keepPreviousData,
   });
 
   // for create we will use mutation
@@ -134,12 +158,16 @@ function Users() {
         </UserFilter>
 
         {/* User page design */}
-        {isLoading && <div>Loading...</div>}
-        {isError && <div>{error.message}</div>}
+        <div className="error-spin-message">
+          {/* NO need ant design table component has loading state */}
+          {/* <div className="spin">{isFetching && <Spin />}</div> */}
+          <div className="error">{isError && <div>{error.message}</div>}</div>
+        </div>
 
         {users && (
           <Table<User>
-            dataSource={users?.data}
+            dataSource={users?.data || []}
+            loading={isFetching}
             pagination={{
               total: users?.total,
               pageSize: queryParams.pageSize,

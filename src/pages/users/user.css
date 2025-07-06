@@ -13,3 +13,13 @@
     gap: 16px;
   }
 }
+
+.error-spin-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  .error {
+    color: red;
+  }
+}

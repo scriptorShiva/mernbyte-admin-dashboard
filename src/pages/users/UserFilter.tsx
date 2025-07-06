@@ -50,7 +50,7 @@ const UserFilter = ({ onFilterChange, children }: UserFilterProps) => {
                 ]}
                 placeholder="Select"
                 size="large"
-                onChange={(e) => onFilterChange("role", e)}
+                onChange={(value) => onFilterChange("role", value || "")}
               />
             </div>
           </div>
