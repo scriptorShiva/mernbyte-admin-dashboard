@@ -21,9 +21,10 @@ import ColumnGroup from "antd/es/table/ColumnGroup";
 import Column from "antd/es/table/Column";
 import { useAuthStore } from "../../store";
 import UserFilter from "./UserFilter";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PlusOutlined } from "@ant-design/icons";
 import UserForm from "./forms/UserForm";
+import { debounce } from "lodash";
 
 const roleColors: Record<string, string> = {
   admin: "purple",
@@ -110,6 +111,29 @@ function Users() {
     },
   });
 
+  // Debouncing
+  // useMemo for memoising/caching. Why we used it.
+  /**
+   * Creates the debouncedSearch only once, when the component mounts.
+   * Reuses the same function on every render (as long as dependencies don’t change).
+   * You’re computing something expensive, or You want to persist a function/object/array between renders without redefining it.
+   */
+  const debouncedSearch = useMemo(() => {
+    return debounce((searchTerm: string) => {
+      setQueryParams((prev) => ({
+        ...prev,
+        q: searchTerm,
+      }));
+    }, 500); // 500ms delay
+  }, []);
+
+  // clean up debounce on unmounts :Enables debouncedSearch.cancel() to work correctly in cleanup.
+  useEffect(() => {
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [debouncedSearch]);
+
   // on form submit
   const onSubmit = async () => {
     // check validations if validations success then next
@@ -141,10 +165,14 @@ function Users() {
         {/* User filter */}
         <UserFilter
           onFilterChange={(filterName: string, filterValue: string) => {
-            setQueryParams({
-              ...queryParams,
-              [filterName]: filterValue,
-            });
+            if (filterName === "q") {
+              debouncedSearch(filterValue);
+            } else {
+              setQueryParams({
+                ...queryParams,
+                [filterName]: filterValue,
+              });
+            }
           }}
         >
           <Button
