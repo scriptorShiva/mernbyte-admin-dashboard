@@ -1,7 +1,7 @@
 import { Card } from "antd";
 import { Input } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
-import "./restaurant.css";
+import "./tenant.css";
 
 interface UserFilterProps {
   children?: React.ReactNode;
@@ -12,7 +12,7 @@ const TenantSearch = ({ onFilterChange, children }: UserFilterProps) => {
   return (
     <>
       <Card>
-        <div className="restaurant-filter-card-container">
+        <div className="tenant-filter-card-container">
           <div className="left-section">
             <div className="search">
               <Input
@@ -25,7 +25,7 @@ const TenantSearch = ({ onFilterChange, children }: UserFilterProps) => {
             </div>
           </div>
           <div className="right-section">
-            <div className="create-restaurant">{children}</div>
+            <div className="create-tenant">{children}</div>
           </div>
         </div>
       </Card>

@@ -1,7 +1,7 @@
-import { Breadcrumb, Button, Drawer, Space, Table, Tag } from "antd";
+import { Breadcrumb, Button, Drawer, Space, Table } from "antd";
 import { Link, Navigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { getRestaurants } from "../../http/api";
+import { getTenants } from "../../http/api";
 import { Tenant } from "../../types";
 import Column from "antd/es/table/Column";
 import { useAuthStore } from "../../store";
@@ -9,7 +9,7 @@ import { useState } from "react";
 import TenantSearch from "./TenantSearch";
 import { PlusOutlined } from "@ant-design/icons";
 
-function Restaurants() {
+function Tenants() {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const onClose = () => {
@@ -29,7 +29,7 @@ function Restaurants() {
   } = useQuery({
     queryKey: ["tenants"],
     queryFn: async () => {
-      const res = await getRestaurants();
+      const res = await getTenants();
       console.log(res);
       return res.data.data;
     },
@@ -40,7 +40,7 @@ function Restaurants() {
         <Breadcrumb
           items={[
             { title: <Link to={"/"}>Dashboard</Link> },
-            { title: "Restaurants" },
+            { title: "Tenants" },
           ]}
         />
 
@@ -57,7 +57,7 @@ function Restaurants() {
             size={"large"}
             onClick={() => setDrawerOpen(true)}
           >
-            Add restaurant
+            Add tenant
           </Button>
         </TenantSearch>
 
@@ -99,4 +99,4 @@ function Restaurants() {
   );
 }
 
-export default Restaurants;
+export default Tenants;

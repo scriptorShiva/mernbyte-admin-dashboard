@@ -16,7 +16,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { createUser, getUsers } from "../../http/api";
-import { CreateUserData, User } from "../../types";
+import { CreateUserData, Tenant, User } from "../../types";
 import ColumnGroup from "antd/es/table/ColumnGroup";
 import Column from "antd/es/table/Column";
 import { useAuthStore } from "../../store";
@@ -123,6 +123,7 @@ function Users() {
       setQueryParams((prev) => ({
         ...prev,
         q: searchTerm,
+        current: 1,
       }));
     }, 500); // 500ms delay
   }, []);
@@ -171,6 +172,7 @@ function Users() {
               setQueryParams({
                 ...queryParams,
                 [filterName]: filterValue,
+                current: 1,
               });
             }
           }}
@@ -207,6 +209,8 @@ function Users() {
                   pageSize: pageSize,
                 });
               },
+              showTotal: (total, range) =>
+                `${range[0]}-${range[1]} of ${total}`,
             }}
             scroll={{ x: "max-content" }}
             rowKey={(user) => user.id}
@@ -232,6 +236,12 @@ function Users() {
                   {role.toUpperCase()}
                 </Tag>
               )}
+            />
+            <Column
+              title="Tenant"
+              dataIndex="tenant"
+              key="tenant"
+              render={(tenant: Tenant) => tenant?.name}
             />
           </Table>
         )}

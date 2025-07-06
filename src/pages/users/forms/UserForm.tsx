@@ -1,6 +1,6 @@
 import { Card, Form, Input, Select } from "antd";
 import "./userform.css";
-import { getRestaurants } from "../../../http/api";
+import { getTenants } from "../../../http/api";
 import { useQuery } from "@tanstack/react-query";
 import { Tenant } from "../../../types";
 
@@ -9,7 +9,7 @@ const UserForm = () => {
   const { data: tenants } = useQuery({
     queryKey: ["tenants"],
     queryFn: async () => {
-      const res = await getRestaurants();
+      const res = await getTenants();
       console.log(res);
       return res.data.data;
     },
@@ -125,11 +125,9 @@ const UserForm = () => {
                 </Select>
               </Form.Item>
               <Form.Item
-                label="Select Restaurant"
+                label="Select Tenant"
                 name="tenantId"
-                rules={[
-                  { required: true, message: "Please select restaurant!" },
-                ]}
+                rules={[{ required: true, message: "Please select a tenant!" }]}
               >
                 <Select
                   //   defaultValue="demo"
