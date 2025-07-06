@@ -1,4 +1,4 @@
-import { Navigate, NavLink, Outlet } from "react-router-dom";
+import { Navigate, NavLink, Outlet, useLocation } from "react-router-dom";
 import { useAuthStore } from "../store";
 import {
   Avatar,
@@ -35,12 +35,6 @@ const getItemsListBasedOnRole = (role: string) => {
       icon: <HomeOutlined />,
       label: <NavLink to="/">Home</NavLink>,
     },
-
-    {
-      key: "/tenants",
-      icon: <ShopOutlined />,
-      label: <NavLink to="/tenants">Tenants</NavLink>,
-    },
     {
       key: "/products",
       icon: <ProductOutlined />,
@@ -64,12 +58,20 @@ const getItemsListBasedOnRole = (role: string) => {
       icon: <UserOutlined />,
       label: <NavLink to="/users">Users</NavLink>,
     });
+
+    baseItems.splice(2, 0, {
+      key: "/tenants",
+      icon: <ShopOutlined />,
+      label: <NavLink to="/tenants">Tenants</NavLink>,
+    });
   }
 
   return baseItems;
 };
 
 const Dashboard = () => {
+  const location = useLocation();
+
   const [collapsed, setCollapsed] = useState(false);
   const {
     token: { colorBgContainer },
@@ -94,7 +96,12 @@ const Dashboard = () => {
   const items = getItemsListBasedOnRole(user?.role as string);
 
   if (user === null) {
-    return <Navigate to="/auth/login" replace={true} />;
+    return (
+      <Navigate
+        to={`/auth/login?returnTo=${location.pathname}`}
+        replace={true}
+      />
+    );
   }
 
   return (
@@ -113,7 +120,7 @@ const Dashboard = () => {
 
             <Menu
               theme="light"
-              defaultSelectedKeys={["/"]}
+              defaultSelectedKeys={[location.pathname]}
               mode="inline"
               items={items}
             />
