@@ -3,6 +3,7 @@ import {
   Button,
   Drawer,
   Form,
+  Modal,
   Space,
   //Spin,
   Table,
@@ -15,14 +16,19 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { createUser, getUsers } from "../../http/api";
+import { createUser, deleteUser, getUsers, updateUser } from "../../http/api";
 import { CreateUserData, Tenant, User } from "../../types";
 import ColumnGroup from "antd/es/table/ColumnGroup";
 import Column from "antd/es/table/Column";
 import { useAuthStore } from "../../store";
 import UserFilter from "./UserFilter";
 import { useEffect, useMemo, useState } from "react";
-import { PlusOutlined } from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  PlusOutlined,
+  WarningFilled,
+} from "@ant-design/icons";
 import UserForm from "./forms/UserForm";
 import { debounce } from "lodash";
 
@@ -36,6 +42,13 @@ const roleColors: Record<string, string> = {
 function Users() {
   // state
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  // on click on edit
+  const [editUser, setEditUser] = useState<User | null>(null);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [deleteUserId, setDeleteUserId] = useState<string | null>(null);
 
   // ant design form hook
   const [formData] = Form.useForm();
@@ -55,6 +68,7 @@ function Users() {
   const onClose = () => {
     setDrawerOpen(false);
     formData.resetFields();
+    setEditUser(null);
   };
 
   // Accept admin no one will be able to access this users list.
@@ -111,6 +125,35 @@ function Users() {
     },
   });
 
+  // for update we will use this mutation
+  const { mutate: updateUserMutate } = useMutation({
+    mutationKey: ["updateUser"],
+    mutationFn: async (data: CreateUserData) => {
+      const res = await updateUser(String(editUser!.id), data);
+      return res.data;
+    },
+    onSuccess: () => {
+      formData.resetFields();
+      onClose();
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
+  // for delete we will use this mutation
+  const { mutate: deleteUserMutate } = useMutation({
+    mutationKey: ["deleteUser"],
+    mutationFn: async (id: string) => {
+      const res = await deleteUser(id);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
+  });
+
   // Debouncing
   // useMemo for memoising/caching. Why we used it.
   /**
@@ -135,22 +178,59 @@ function Users() {
     };
   }, [debouncedSearch]);
 
+  // on click on edit open drawer and populate data in it as state changes
+  useEffect(() => {
+    if (editUser) {
+      formData.setFieldsValue({
+        firstname: editUser.firstName,
+        lastname: editUser.lastName,
+        email: editUser.email,
+        role: editUser.role,
+        password: "",
+        tenantId: editUser.tenant?.id,
+      });
+    }
+  }, [editUser]);
+
   // on form submit
   const onSubmit = async () => {
     // check validations if validations success then next
     await formData.validateFields();
+
     const values = await formData.getFieldsValue();
 
-    createUserMutate({
-      firstName: values.firstname,
-      lastName: values.lastname,
-      email: values.email,
-      password: values.password,
-      role: values.role,
-      tenantId: values.tenantId,
-    });
+    if (!!editUser) {
+      updateUserMutate({
+        firstName: values.firstname,
+        lastName: values.lastname,
+        email: values.email,
+        password: values.password,
+        role: values.role,
+        tenantId: values.tenantId,
+      });
+    } else {
+      createUserMutate({
+        firstName: values.firstname,
+        lastName: values.lastname,
+        email: values.email,
+        password: values.password,
+        role: values.role,
+        tenantId: values.tenantId,
+      });
+    }
+  };
 
-    console.log(formData.getFieldsValue());
+  // delete user
+  const onDelete = (id: string) => {
+    deleteUserMutate(id, {
+      onSuccess: () => {
+        setIsModalOpen(false); // close modal on success
+        setDeleteUserId(null); // reset selected id
+      },
+      onError: (error) => {
+        console.error("Failed to delete user", error);
+      },
+    });
   };
 
   return (
@@ -243,6 +323,37 @@ function Users() {
               key="tenant"
               render={(tenant: Tenant) => tenant?.name}
             />
+
+            <Column
+              title="Action"
+              key="action"
+              render={(_, record: User) => {
+                return (
+                  <Space size="middle">
+                    {/* Edit */}
+                    <Button
+                      type="link"
+                      onClick={() => {
+                        setDrawerOpen(true);
+                        setEditUser(record);
+                      }}
+                    >
+                      <EditOutlined />
+                    </Button>
+                    {/* Delete */}
+                    <Button
+                      type="link"
+                      onClick={() => {
+                        setDeleteUserId(String(record.id!));
+                        setIsModalOpen(true);
+                      }}
+                    >
+                      <DeleteOutlined />
+                    </Button>
+                  </Space>
+                );
+              }}
+            />
           </Table>
         )}
       </Space>
@@ -250,7 +361,7 @@ function Users() {
       {/* Drawer component */}
       <Drawer
         className="custom-drawer"
-        title="Create a new account"
+        title={!!editUser ? "Edit User" : "Create a new account"}
         width={720}
         onClose={onClose}
         open={drawerOpen}
@@ -265,9 +376,30 @@ function Users() {
         }
       >
         <Form layout="vertical" form={formData}>
-          <UserForm />
+          <UserForm editMode={!!editUser} />
         </Form>
       </Drawer>
+
+      {/* Modal for delete User */}
+      <Modal
+        title={
+          <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <WarningFilled style={{ color: "#D89614", fontSize: 25 }} />
+            Confirm Deletion
+          </span>
+        }
+        closable={{ "aria-label": "Custom Close Button" }}
+        open={isModalOpen}
+        onOk={() => {
+          if (deleteUserId) {
+            onDelete(deleteUserId);
+          }
+        }}
+        onCancel={() => setIsModalOpen(false)}
+        okButtonProps={{ danger: true }}
+      >
+        <p>Are you sure you want to delete this user?</p>
+      </Modal>
     </>
   );
 }

@@ -4,7 +4,7 @@ import { getTenants } from "../../../http/api";
 import { useQuery } from "@tanstack/react-query";
 import { Tenant } from "../../../types";
 
-const UserForm = () => {
+const UserForm = ({ editMode }: { editMode?: boolean }) => {
   // use query
   const { data: tenants } = useQuery({
     queryKey: ["tenants"],
@@ -58,51 +58,53 @@ const UserForm = () => {
           </div>
         </Card>
 
-        <Card>
-          <div className="section-b">
-            <div className="security-info-header">Security Info</div>
-            <div className="password">
-              <Form.Item
-                label="Password"
-                name="password"
-                rules={[
-                  { required: true, message: "Please input your password!" },
-                  {
-                    min: 8,
-                    message: "Password must be at least 8 characters",
-                  },
-                  {
-                    pattern:
-                      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-                    message:
-                      "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
-                  },
-                ]}
-              >
-                <Input type="password" placeholder="********" />
-              </Form.Item>
-              <Form.Item
-                label="Confirm Password"
-                name="confirm-password"
-                rules={[
-                  { required: true, message: "Please input your password!" },
-                  ({ getFieldValue }) => ({
-                    validator(_, value) {
-                      if (value && value !== getFieldValue("password")) {
-                        return Promise.reject(
-                          "The two passwords that you entered do not match!"
-                        );
-                      }
-                      return Promise.resolve();
+        {!editMode && (
+          <Card>
+            <div className="section-b">
+              <div className="security-info-header">Security Info</div>
+              <div className="password">
+                <Form.Item
+                  label="Password"
+                  name="password"
+                  rules={[
+                    { required: true, message: "Please input your password!" },
+                    {
+                      min: 8,
+                      message: "Password must be at least 8 characters",
                     },
-                  }),
-                ]}
-              >
-                <Input type="password" placeholder="********" />
-              </Form.Item>
+                    {
+                      pattern:
+                        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+                      message:
+                        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+                    },
+                  ]}
+                >
+                  <Input type="password" placeholder="********" />
+                </Form.Item>
+                <Form.Item
+                  label="Confirm Password"
+                  name="confirm-password"
+                  rules={[
+                    { required: true, message: "Please input your password!" },
+                    ({ getFieldValue }) => ({
+                      validator(_, value) {
+                        if (value && value !== getFieldValue("password")) {
+                          return Promise.reject(
+                            "The two passwords that you entered do not match!"
+                          );
+                        }
+                        return Promise.resolve();
+                      },
+                    }),
+                  ]}
+                >
+                  <Input type="password" placeholder="********" />
+                </Form.Item>
+              </div>
             </div>
-          </div>
-        </Card>
+          </Card>
+        )}
 
         <Card>
           <div className="section-c">
