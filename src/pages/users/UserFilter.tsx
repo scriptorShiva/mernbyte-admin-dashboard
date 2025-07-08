@@ -46,7 +46,6 @@ const UserFilter = ({ onFilterChange, children }: UserFilterProps) => {
                 options={[
                   { value: "manager", label: "Manager" },
                   { value: "admin", label: "Admin" },
-                  { value: "customer", label: "Customer" },
                 ]}
                 placeholder="Select"
                 size="large"

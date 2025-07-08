@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Tenant } from "../../../types";
 
 const UserForm = ({ editMode }: { editMode?: boolean }) => {
+  const selectedRole = Form.useWatch("role");
   // use query
   const { data: tenants } = useQuery({
     queryKey: ["tenants"],
@@ -123,29 +124,30 @@ const UserForm = ({ editMode }: { editMode?: boolean }) => {
                 >
                   <Select.Option value="admin">Admin</Select.Option>
                   <Select.Option value="manager">Manager</Select.Option>
-                  <Select.Option value="customer">Customer</Select.Option>
                 </Select>
               </Form.Item>
-              <Form.Item
-                label="Select Tenant"
-                name="tenantId"
-                rules={[{ required: true, message: "Please select a tenant!" }]}
-              >
-                <Select
-                  //   defaultValue="demo"
-                  allowClear={true}
-                  onChange={() => {}}
-                  placeholder="Select Role"
-                >
-                  {tenants?.map((tenant: Tenant) => {
-                    return (
-                      <Select.Option key={tenant.id} value={tenant.id}>
-                        {tenant.name}
-                      </Select.Option>
-                    );
-                  })}
-                </Select>
-              </Form.Item>
+              {
+                // if role is admin
+                selectedRole != "admin" && (
+                  <Form.Item
+                    label="Select Tenant"
+                    name="tenant"
+                    rules={[{ required: true, message: "Tenant required!" }]}
+                  >
+                    <Select
+                      //   defaultValue="demo"
+                      allowClear={true}
+                      placeholder="Select Tenant"
+                    >
+                      {tenants?.map((tenant: Tenant) => (
+                        <Select.Option value={tenant.id}>
+                          {tenant.name}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                )
+              }
             </div>
           </div>
         </Card>
