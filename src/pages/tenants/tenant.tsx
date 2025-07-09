@@ -106,6 +106,10 @@ function Tenants() {
       const res = await deleteTenant(tenantId);
       return res.data.data;
     },
+    onSuccess: () => {
+      // after delete refetch
+      queryClient.invalidateQueries({ queryKey: ["tenants"] });
+    },
   });
 
   const onClose = () => {
