@@ -1,0 +1,26 @@
+.container {
+  .ant-form-item {
+    flex: 1; /* ensures equal width and allows children to expand */
+  }
+  .ant-input {
+    width: 100% !important; /* makes input take full width */
+  }
+  .ant-form-item-label > label {
+    color: #838181;
+    font-weight: 500;
+  }
+  display: grid;
+  gap: 1rem;
+}
+
+.section-a {
+  .store-header {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+
+  .store-name {
+    display: flex;
+  }
+}
