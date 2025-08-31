@@ -5,7 +5,9 @@ function Logo() {
   return (
     <div className="logo-container">
       <img src={LogoImage} alt="logo" className="logo-image" />
-      <span className="logo-text">localmart</span>
+      <span className="logo-text">
+        <span className="logo-text-monk">monk</span>Market
+      </span>
     </div>
   );
 }
