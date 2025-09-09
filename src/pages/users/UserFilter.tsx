@@ -17,8 +17,7 @@ const UserFilter = ({ onFilterChange, children }: UserFilterProps) => {
             <div className="search">
               <Input
                 addonBefore={<SearchOutlined />}
-                placeholder="Search..."
-                size="large"
+                placeholder="Search by name or email..."
                 onChange={(e) => onFilterChange("q", e.target.value)}
                 allowClear
               />
@@ -33,8 +32,7 @@ const UserFilter = ({ onFilterChange, children }: UserFilterProps) => {
                   { value: "inactive", label: "Inactive" },
                   { value: "banned", label: "Banned" },
                 ]}
-                placeholder="Select "
-                size="large"
+                placeholder="Status"
                 onChange={(e) => onFilterChange("status", e)}
               />
             </div>
@@ -47,8 +45,7 @@ const UserFilter = ({ onFilterChange, children }: UserFilterProps) => {
                   { value: "manager", label: "Manager" },
                   { value: "admin", label: "Admin" },
                 ]}
-                placeholder="Select"
-                size="large"
+                placeholder="Role"
                 onChange={(value) => onFilterChange("role", value || "")}
               />
             </div>

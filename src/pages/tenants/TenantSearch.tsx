@@ -17,8 +17,7 @@ const TenantSearch = ({ onFilterChange, children }: UserFilterProps) => {
             <div className="search">
               <Input
                 addonBefore={<SearchOutlined />}
-                placeholder="Search..."
-                size="large"
+                placeholder="Search by store name..."
                 onChange={(e) => onFilterChange("q", e.target.value)}
                 allowClear
               />
