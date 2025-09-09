@@ -42,17 +42,12 @@ const roleColors: Record<string, string> = {
 function Users() {
   // state
   const [drawerOpen, setDrawerOpen] = useState(false);
-
   // on click on edit
   const [editUser, setEditUser] = useState<User | null>(null);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [deleteUserId, setDeleteUserId] = useState<string | null>(null);
-
   // ant design form hook
   const [formData] = Form.useForm();
-
   // query params
   const [queryParams, setQueryParams] = useState({
     current: 1,
@@ -70,12 +65,6 @@ function Users() {
     formData.resetFields();
     setEditUser(null);
   };
-
-  // Accept admin no one will be able to access this users list.
-  const { user } = useAuthStore();
-  if (user?.role !== "admin") {
-    return <Navigate to="/" replace={true} />;
-  }
 
   // react query
   // for get we use useQuery
@@ -95,7 +84,7 @@ function Users() {
       };
 
       // Remove empty , null , undefined values
-      const cleanedParams: Record<string, any> = {};
+      const cleanedParams: Record<string, string> = {};
       Object.entries(rawParams).forEach(([key, value]) => {
         if (value !== "" && value !== undefined && value !== null) {
           cleanedParams[key] = String(value);
@@ -190,7 +179,7 @@ function Users() {
         tenantId: editUser.tenant?.id,
       });
     }
-  }, [editUser]);
+  }, [editUser, formData]);
 
   // on form submit
   const onSubmit = async () => {
@@ -199,7 +188,7 @@ function Users() {
 
     const values = await formData.getFieldsValue();
 
-    if (!!editUser) {
+    if (editUser) {
       updateUserMutate({
         firstName: values.firstname,
         lastName: values.lastname,
@@ -232,6 +221,14 @@ function Users() {
       },
     });
   };
+
+  //   General Rule of Thumb : Always declare hooks first (top of component body).Then perform conditional logic (return, conditional rendering, etc.).
+
+  // Accept admin no one will be able to access this users list.
+  const { user } = useAuthStore();
+  if (user?.role !== "admin") {
+    return <Navigate to="/" replace={true} />;
+  }
 
   return (
     <>
@@ -361,7 +358,7 @@ function Users() {
       {/* Drawer component */}
       <Drawer
         className="custom-drawer"
-        title={!!editUser ? "Edit User" : "Create a new account"}
+        title={editUser ? "Edit User" : "Create a new account"}
         width={720}
         onClose={onClose}
         open={drawerOpen}

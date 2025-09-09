@@ -53,7 +53,7 @@ function Tenants() {
       };
 
       // Remove empty , null , undefined values
-      const cleanedParams: Record<string, any> = {};
+      const cleanedParams: Record<string, string> = {};
       Object.entries(rawParams).forEach(([key, value]) => {
         if (value !== "" && value !== undefined && value !== null) {
           cleanedParams[key] = String(value);
@@ -121,7 +121,7 @@ function Tenants() {
     await form.validateFields();
     const values = await form.getFieldsValue();
 
-    if (!!editTenant) {
+    if (editTenant) {
       updateTenantMutate({
         id: editTenant.id,
         name: values.name,
@@ -151,12 +151,6 @@ function Tenants() {
     });
   };
 
-  // protection
-  const { user } = useAuthStore();
-  if (user?.role !== "admin") {
-    return <Navigate to="/" replace={true} />;
-  }
-
   const debouncedSearch = useMemo(() => {
     return debounce((searchTerm: string) => {
       setQueryParams((prev) => ({
@@ -182,7 +176,14 @@ function Tenants() {
         address: editTenant.address,
       });
     }
-  }, [editTenant]);
+  }, [editTenant, form]);
+
+  //   General Rule of Thumb : Always declare hooks first (top of component body).Then perform conditional logic (return, conditional rendering, etc.).
+  // protection
+  const { user } = useAuthStore();
+  if (user?.role !== "admin") {
+    return <Navigate to="/" replace={true} />;
+  }
 
   return (
     <>
