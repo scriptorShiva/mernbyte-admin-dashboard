@@ -33,3 +33,18 @@ export type Tenant = {
   name: string;
   address: string;
 };
+
+export type Category = {
+  _id: string;
+  name: string;
+};
+
+export type Products = {
+  _id: string;
+  name: string;
+  description: string;
+  category: Category;
+  isPublished: boolean;
+  imageUrl: string;
+  createdAt?: string;
+};

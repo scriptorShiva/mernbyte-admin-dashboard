@@ -34,3 +34,5 @@ export const deleteTenant = (id: string) =>
 
 // Catalog Service
 export const getCategories = () => api.get(`${CATALOG_SERVICE}/categories`);
+export const getProducts = (queryString: string) =>
+  api.get(`${CATALOG_SERVICE}/products?` + queryString);
