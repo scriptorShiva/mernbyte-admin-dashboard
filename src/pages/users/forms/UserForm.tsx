@@ -10,8 +10,8 @@ const UserForm = ({ editMode }: { editMode?: boolean }) => {
   const { data: tenants } = useQuery({
     queryKey: ["tenants"],
     queryFn: async () => {
-      const res = await getTenants();
-      console.log(res);
+      const res = await getTenants("currentPage=1&perPage=100");
+      console.log(res.data.data);
       return res.data.data;
     },
   });
@@ -131,7 +131,7 @@ const UserForm = ({ editMode }: { editMode?: boolean }) => {
                 selectedRole != "admin" && (
                   <Form.Item
                     label="Select Tenant"
-                    name="tenant"
+                    name="tenantId"
                     rules={[{ required: true, message: "Tenant required!" }]}
                   >
                     <Select

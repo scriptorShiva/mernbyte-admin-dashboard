@@ -7,6 +7,7 @@ import { getProducts } from "../../http/api";
 import { Image } from "antd";
 import { Products } from "../../types";
 import { useState } from "react";
+import { useAuthStore } from "../../store";
 
 interface DataType {
   id: string;
@@ -71,6 +72,8 @@ const columns: TableProps<DataType>["columns"] = [
 ];
 
 const Product = () => {
+  // zustand store
+  const { user } = useAuthStore();
   // states
   const [filters, setFilters] = useState({
     q: "",
@@ -96,6 +99,7 @@ const Product = () => {
       if (filters.categoryId) params.categoryId = filters.categoryId;
       if (filters.tenantId) params.tenantId = filters.tenantId;
       if (filters.isPublish) params.isPublish = filters.isPublish;
+      if (user!.tenant?.id) params.tenantId = String(user!.tenant.id);
 
       params.page = String(filters.page);
       params.limit = String(filters.limit);

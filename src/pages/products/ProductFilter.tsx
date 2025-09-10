@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getCategories, getTenants } from "../../http/api";
 import { Category, Tenant } from "../../types";
 import React from "react";
+import { useAuthStore } from "../../store";
 
 type Filters = {
   q: string;
@@ -26,7 +27,7 @@ const ProductFilter = ({
   filters,
   setFilters,
 }: ProductFilterProps) => {
-  //const queryClient = useQueryClient();
+  const { user } = useAuthStore();
 
   // use queries
   const { data: stores } = useQuery({
@@ -73,21 +74,23 @@ const ProductFilter = ({
           placeholder="Category"
         />
 
-        <Select
-          // defaultValue="Tenant A"
-          style={{ width: 160 }}
-          allowClear={true}
-          onChange={(value) =>
-            setFilters((prev) => ({ ...prev, tenantId: value }))
-          }
-          options={stores?.data.data.map((store: Tenant) => {
-            return {
-              value: store.id,
-              label: store.name,
-            };
-          })}
-          placeholder="Store"
-        />
+        {user!.role === "admin" && (
+          <Select
+            // defaultValue="Tenant A"
+            style={{ width: 160 }}
+            allowClear={true}
+            onChange={(value) =>
+              setFilters((prev) => ({ ...prev, tenantId: value }))
+            }
+            options={stores?.data.data.map((store: Tenant) => {
+              return {
+                value: store.id,
+                label: store.name,
+              };
+            })}
+            placeholder="Store"
+          />
+        )}
 
         <div className="switch-container">
           <Switch

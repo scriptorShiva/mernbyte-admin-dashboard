@@ -103,7 +103,6 @@ function Users() {
   const { mutate: createUserMutate } = useMutation({
     mutationKey: ["createUser"],
     mutationFn: async (data: CreateUserData) => {
-      console.log(data, "ddd");
       const res = await createUser(data);
       return res.data;
     },
@@ -118,6 +117,7 @@ function Users() {
   const { mutate: updateUserMutate } = useMutation({
     mutationKey: ["updateUser"],
     mutationFn: async (data: CreateUserData) => {
+      console.log(data, "ddd");
       const res = await updateUser(String(editUser!.id), data);
       return res.data;
     },
