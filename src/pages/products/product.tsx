@@ -1,4 +1,13 @@
-import { Breadcrumb, Button, Space, Table, TableProps, Tag } from "antd";
+import {
+  Breadcrumb,
+  Button,
+  Drawer,
+  Form,
+  Space,
+  Table,
+  TableProps,
+  Tag,
+} from "antd";
 import { Link } from "react-router-dom";
 import ProductFilter from "./ProductFilter";
 import { PlusOutlined } from "@ant-design/icons";
@@ -8,6 +17,7 @@ import { Image } from "antd";
 import { Products } from "../../types";
 import { useState } from "react";
 import { useAuthStore } from "../../store";
+import ProductForm from "./forms/ProductForm";
 
 interface DataType {
   id: string;
@@ -74,6 +84,8 @@ const columns: TableProps<DataType>["columns"] = [
 const Product = () => {
   // zustand store
   const { user } = useAuthStore();
+  // ant design form hook
+  const [formData] = Form.useForm();
   // states
   const [filters, setFilters] = useState({
     q: "",
@@ -83,6 +95,7 @@ const Product = () => {
     page: 1,
     limit: 1,
   });
+  const [open, setOpen] = useState(false);
   // use query
   // get products
   const {
@@ -124,6 +137,15 @@ const Product = () => {
         : "",
     })) ?? [];
 
+  // methods
+  const showLoading = () => {
+    setOpen(true);
+  };
+
+  const onSubmit = () => {
+    setOpen(false);
+  };
+
   return (
     <>
       <Space direction="vertical" size={"large"} style={{ width: "100%" }}>
@@ -144,7 +166,7 @@ const Product = () => {
               type="primary"
               icon={<PlusOutlined />}
               size={"large"}
-              //onClick={() => setDrawerOpen(true)}
+              onClick={showLoading}
             >
               Create Products
             </Button>
@@ -178,6 +200,31 @@ const Product = () => {
           }}
         />
       </Space>
+
+      {/* Drawer for create or edit the product */}
+      <Drawer
+        className="custom-drawer"
+        closable
+        destroyOnClose={true}
+        title={<span>Create Product</span>}
+        width={720}
+        placement="right"
+        open={open}
+        //loading={loading}
+        onClose={() => setOpen(false)}
+        extra={
+          <Space>
+            <Button onClick={() => setOpen(false)}>Cancel</Button>
+            <Button type="primary" onClick={() => onSubmit()}>
+              Submit
+            </Button>
+          </Space>
+        }
+      >
+        <Form layout="vertical" form={formData}>
+          <ProductForm />
+        </Form>
+      </Drawer>
     </>
   );
 };

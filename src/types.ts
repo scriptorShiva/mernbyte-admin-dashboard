@@ -34,9 +34,29 @@ export type Tenant = {
   address: string;
 };
 
+export type PriceConfigurationOption = {
+  priceType: "base" | "additional";
+  availableOptions: string[];
+  _id: string;
+};
+
+export type Attribute = {
+  name: string;
+  widgetType: "switch" | "radio" | "text" | "select";
+  defaultValue: string;
+  availableOptions: string[];
+  _id: string;
+};
+
 export type Category = {
   _id: string;
   name: string;
+  priceConfiguration: {
+    [key: string]: PriceConfigurationOption; //The object can have any number of keys.
+  };
+  attributes: Attribute[];
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type Products = {

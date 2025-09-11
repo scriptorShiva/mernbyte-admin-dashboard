@@ -18,3 +18,7 @@
     margin-left: auto;
   }
 }
+
+.drawer-title {
+  justify-items: center;
+}
