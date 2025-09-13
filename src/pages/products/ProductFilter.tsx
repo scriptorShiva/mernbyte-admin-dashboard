@@ -11,7 +11,7 @@ type Filters = {
   q: string;
   categoryId: string;
   tenantId: string;
-  isPublish: string;
+  isPublished: string;
   page: number;
   limit: number;
 };
@@ -95,7 +95,7 @@ const ProductFilter = ({
         <div className="switch-container">
           <Switch
             onChange={(value) =>
-              setFilters((prev) => ({ ...prev, isPublish: String(value) }))
+              setFilters((prev) => ({ ...prev, isPublished: String(value) }))
             }
           />
           <span>Show only published</span>

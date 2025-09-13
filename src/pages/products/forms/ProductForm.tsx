@@ -16,6 +16,7 @@ import { getCategories, getTenants } from "../../../http/api";
 import { Category, Tenant } from "../../../types";
 import { useState } from "react";
 import "./productform.css";
+import { useAuthStore } from "../../../store";
 
 type FieldType = {
   name: string;
@@ -30,6 +31,8 @@ const normFile = (e: any) => {
 };
 
 const ProductForm = () => {
+  // zustand
+  const { user } = useAuthStore();
   // states
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(
     null
@@ -150,17 +153,25 @@ const ProductForm = () => {
             label="Tenant"
             rules={[{ required: true }]}
           >
-            <Select
-              placeholder="Select a tenant"
-              //onChange={onGenderChange}
-              allowClear
-            >
-              {tenants.map((tenant: Tenant) => (
-                <Option key={tenant.id} value={tenant.id}>
-                  {tenant.name}
-                </Option>
-              ))}
-            </Select>
+            {user!.role === "admin" ? (
+              <Select
+                placeholder="Select a tenant"
+                //onChange={onGenderChange}
+                allowClear
+              >
+                {tenants.map((tenant: Tenant) => (
+                  <Option key={tenant.id} value={tenant.id}>
+                    {tenant.name}
+                  </Option>
+                ))}
+              </Select>
+            ) : (
+              <Input
+                disabled
+                value={user!.tenant!.name}
+                defaultValue={user!.tenant!.name}
+              />
+            )}
           </Form.Item>
         </div>
       </Card>
@@ -256,7 +267,11 @@ const ProductForm = () => {
 
       <Card title="Other properties">
         <div className="section-f">
-          <Form.Item name="isPublish" label="Published" valuePropName="checked">
+          <Form.Item
+            name="isPublished"
+            label="Published"
+            valuePropName="checked"
+          >
             <Switch />
           </Form.Item>
         </div>

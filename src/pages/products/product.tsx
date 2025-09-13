@@ -98,9 +98,9 @@ const Product = () => {
     q: "",
     categoryId: "",
     tenantId: "",
-    isPublish: "",
+    isPublished: "",
     page: 1,
-    limit: 10,
+    limit: 6,
   });
   const [open, setOpen] = useState(false);
 
@@ -120,7 +120,7 @@ const Product = () => {
       if (filters.q) params.q = filters.q;
       if (filters.categoryId) params.categoryId = filters.categoryId;
       if (filters.tenantId) params.tenantId = filters.tenantId;
-      if (filters.isPublish) params.isPublish = filters.isPublish;
+      if (filters.isPublished) params.isPublished = filters.isPublished;
       if (user!.tenant?.id) params.tenantId = String(user!.tenant.id);
 
       params.page = String(filters.page);
@@ -211,6 +211,7 @@ const Product = () => {
       image: rest.image,
       priceConfiguration: reducedResult,
       attributes: formattedAttributes,
+      tenantId: user!.role === "admin" ? values.tenantId : user!.tenant?.id,
     };
 
     const serverFormData = makeFormDataForServer(finalPayload);
