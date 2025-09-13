@@ -24,9 +24,9 @@ type FieldType = {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const normFile = (e: any) => {
   if (Array.isArray(e)) {
-    return e;
+    return e.slice(0, 1); // always keep only the first file
   }
-  return e?.fileList;
+  return e?.fileList?.slice(0, 1);
 };
 
 const ProductForm = () => {
@@ -78,7 +78,7 @@ const ProductForm = () => {
           </Form.Item>
 
           <Form.Item
-            name="category"
+            name="categoryId"
             label="Category"
             rules={[{ required: true }]}
           >
@@ -96,8 +96,17 @@ const ProductForm = () => {
             </Select>
           </Form.Item>
 
-          <Form.Item label="Description">
-            <TextArea rows={4} />
+          <Form.Item
+            label="Description"
+            name="description"
+            rules={[
+              {
+                required: true,
+                message: "Please input your product description!",
+              },
+            ]}
+          >
+            <TextArea placeholder="description" allowClear rows={4} />
           </Form.Item>
         </div>
       </Card>
@@ -106,11 +115,17 @@ const ProductForm = () => {
         <div className="section-b">
           <Form.Item
             label="Upload"
+            name="image"
             valuePropName="fileList"
             getValueFromEvent={normFile}
-            rules={[{ required: true }]}
+            rules={[{ required: true, message: "Please upload an image!" }]}
           >
-            <Upload action="/upload.do" listType="picture-card">
+            <Upload
+              beforeUpload={() => false}
+              listType="picture-card"
+              maxCount={1}
+              accept="image/*"
+            >
               <button
                 style={{
                   color: "inherit",
@@ -130,7 +145,11 @@ const ProductForm = () => {
 
       <Card title="Tenant Info">
         <div className="section-c">
-          <Form.Item name="tenant" label="Tenant" rules={[{ required: true }]}>
+          <Form.Item
+            name="tenantId"
+            label="Tenant"
+            rules={[{ required: true }]}
+          >
             <Select
               placeholder="Select a tenant"
               //onChange={onGenderChange}
@@ -157,7 +176,14 @@ const ProductForm = () => {
                       {value.availableOptions.map((option) => (
                         <div key={option}>
                           <Form.Item
-                            name={option}
+                            name={[
+                              "priceConfiguration",
+                              JSON.stringify({
+                                key: key,
+                                priceType: value.priceType,
+                              }),
+                              option,
+                            ]}
                             label={option}
                             rules={[
                               {
@@ -189,7 +215,8 @@ const ProductForm = () => {
               <div key={attribute._id}>
                 <Form.Item
                   key={attribute._id}
-                  name={attribute.name}
+                  name={["attributes", attribute.name]}
+                  initialValue={attribute.defaultValue}
                   label={attribute.name}
                   rules={[
                     {
@@ -229,7 +256,7 @@ const ProductForm = () => {
 
       <Card title="Other properties">
         <div className="section-f">
-          <Form.Item label="Published" valuePropName="checked">
+          <Form.Item name="isPublish" label="Published" valuePropName="checked">
             <Switch />
           </Form.Item>
         </div>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Breadcrumb,
   Button,
@@ -11,13 +12,19 @@ import {
 import { Link } from "react-router-dom";
 import ProductFilter from "./ProductFilter";
 import { PlusOutlined } from "@ant-design/icons";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { getProducts } from "../../http/api";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { createProduct, getProducts } from "../../http/api";
 import { Image } from "antd";
 import { Products } from "../../types";
 import { useState } from "react";
 import { useAuthStore } from "../../store";
 import ProductForm from "./forms/ProductForm";
+import { makeFormDataForServer } from "./helpers";
 
 interface DataType {
   id: string;
@@ -93,9 +100,11 @@ const Product = () => {
     tenantId: "",
     isPublish: "",
     page: 1,
-    limit: 1,
+    limit: 10,
   });
   const [open, setOpen] = useState(false);
+
+  const queryClient = useQueryClient();
   // use query
   // get products
   const {
@@ -124,6 +133,28 @@ const Product = () => {
     placeholderData: keepPreviousData, //keeps old page while loading new one
   });
 
+  // create products
+  const { mutate: createProductMutate, isPending: isLoadingForm } = useMutation(
+    {
+      mutationKey: ["createProduct"],
+
+      mutationFn: async (data: FormData) =>
+        createProduct(data).then((res) => res.data),
+      onSuccess: () => {
+        // It marks the ["products"] query as stale and triggers a refetch to get the latest data from the server to update the UI.
+        queryClient.invalidateQueries({
+          queryKey: ["products"],
+        });
+
+        // after submitting the form
+        formData.resetFields();
+        setOpen(false);
+
+        return;
+      },
+    }
+  );
+
   const tableData =
     products?.data.map((product: Products) => ({
       id: product._id,
@@ -142,7 +173,49 @@ const Product = () => {
     setOpen(true);
   };
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
+    // check validations
+    formData.validateFields();
+
+    // get the formdata
+    const values = formData.getFieldsValue();
+    const { priceConfiguration, attributes, ...rest } = values;
+
+    // Flatten priceConfiguration
+    // convert in array
+    const oe = Object.entries(priceConfiguration || {});
+
+    // add reduce
+    const reducedResult = oe.reduce(
+      (acc: Record<string, any>, [key, value]) => {
+        const parsedKey = JSON.parse(key);
+
+        acc[parsedKey.key] = {
+          priceType: parsedKey.priceType,
+          availableOptions: value,
+        };
+
+        return acc;
+      },
+      {} as Record<string, any>
+    );
+
+    // Convert attributes object to array
+    const formattedAttributes = Object.entries(attributes || {}).map(
+      ([name, value]) => ({ name, value })
+    );
+
+    // Combine into final API payload
+    const finalPayload = {
+      ...rest,
+      image: rest.image,
+      priceConfiguration: reducedResult,
+      attributes: formattedAttributes,
+    };
+
+    const serverFormData = makeFormDataForServer(finalPayload);
+
+    await createProductMutate(serverFormData);
     setOpen(false);
   };
 
@@ -215,7 +288,11 @@ const Product = () => {
         extra={
           <Space>
             <Button onClick={() => setOpen(false)}>Cancel</Button>
-            <Button type="primary" onClick={() => onSubmit()}>
+            <Button
+              type="primary"
+              onClick={() => onSubmit()}
+              loading={isLoadingForm}
+            >
               Submit
             </Button>
           </Space>
